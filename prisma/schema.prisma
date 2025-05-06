@@ -1,0 +1,60 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Script {
+  id            String         @id @default(cuid())
+  questionAr    String
+  questionFr    String
+  responseAr    String
+  responseFr    String
+  keywords      String[]
+  category      String?
+  active        Boolean        @default(true)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  conversations Conversation[]
+}
+
+model Patient {
+  id             String         @id @default(cuid())
+  phoneNumber    String         @unique
+  name           String?
+  language       Language       @default(FRENCH)
+  lastInteracted DateTime?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  conversations  Conversation[]
+}
+
+model Conversation {
+  id             String   @id @default(cuid())
+  patientId      String
+  scriptId       String?
+  messageContent String
+  response       String
+  timestamp      DateTime @default(now())
+  matched        Boolean  @default(false)
+  similarity     Float?   @default(0)
+  patient        Patient  @relation(fields: [patientId], references: [id])
+  script         Script?  @relation(fields: [scriptId], references: [id])
+}
+
+model Setting {
+  id               String   @id @default(cuid())
+  welcomeMessageAr String
+  welcomeMessageFr String
+  matchThreshold   Float    @default(0.7)
+  autoReplyEnabled Boolean  @default(true)
+  updatedAt        DateTime @updatedAt
+}
+
+enum Language {
+  FRENCH
+  ARABIC
+}
