@@ -6,7 +6,7 @@ import { processMessage } from './actions';
 const WHATSAPP_PHONE_NUMBER = process.env.WHATSAPP_PHONE_NUMBER;
 const WHATSAPP_API_KEY = process.env.WHATSAPP_API_KEY;
 const WHATSAPP_BUSINESS_ID = process.env.WHATSAPP_BUSINESS_ID;
-const WHATSAPP_API_URL = `https://graph.facebook.com/v22.0/${WHATSAPP_PHONE_NUMBER}/messages`;
+const WHATSAPP_API_URL = `https://graph.facebook.com/v18.0/${WHATSAPP_PHONE_NUMBER}/messages`;
 
 export async function sendWhatsAppMessage(to: string, message: string) {
   try {
