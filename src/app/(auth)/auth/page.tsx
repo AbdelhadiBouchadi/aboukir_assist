@@ -21,12 +21,11 @@ import {
   InputOTPSlot,
   InputOTPSeparator,
 } from '@/components/ui/input-otp';
-import { useToast } from '@/hooks/use-toast';
+import toast from 'react-hot-toast';
 
 export default function AuthPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const { toast } = useToast();
   const [error, setError] = useState('');
   const [otp, setOtp] = useState('');
 
@@ -39,20 +38,13 @@ export default function AuthPage() {
       const result = await verifyOTP(otp);
 
       if (result.success) {
-        toast({
-          title: 'Verified',
-          description: 'The OTP is correct.',
-        });
+        toast.success('Logged in successfully');
         router.push('/');
       } else {
         setError(result.error || 'Invalid OTP code');
       }
     } catch (error) {
-      toast({
-        title: 'Error',
-        description: 'The OTP Verification failed.',
-        variant: 'destructive',
-      });
+      toast.error('OTP Incorrect');
       console.error('Verification error:', error);
       setError('An unexpected error occurred');
     } finally {

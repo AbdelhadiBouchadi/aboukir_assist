@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import Link from 'next/link';
 import { getScripts } from '@/lib/actions';
+import { ScriptsLoading } from '@/components/shared/Scripts/ScriptLoading';
 
 export default async function ScriptPage() {
   return (
@@ -24,7 +25,7 @@ export default async function ScriptPage() {
         </Link>
       </div>
 
-      <Suspense fallback={<div>Loading script entries...</div>}>
+      <Suspense fallback={<ScriptsLoading />}>
         <ScriptListWrapper />
       </Suspense>
     </div>

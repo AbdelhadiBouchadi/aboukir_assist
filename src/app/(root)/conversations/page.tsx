@@ -7,6 +7,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { ConversationList } from './ConversationsList';
+import { ConversationsLoading } from '@/components/shared/Conversations/ConversationsLoading';
 
 export default function ConversationsPage() {
   return (
@@ -26,9 +27,7 @@ export default function ConversationsPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="p-0">
-          <Suspense
-            fallback={<div className="p-6">Loading conversations...</div>}
-          >
+          <Suspense fallback={<ConversationsLoading />}>
             <ConversationListWrapper />
           </Suspense>
         </CardContent>
