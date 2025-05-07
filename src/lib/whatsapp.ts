@@ -10,22 +10,19 @@ const WHATSAPP_API_URL = `https://graph.facebook.com/v22.0/${WHATSAPP_PHONE_NUMB
 
 export async function sendWhatsAppMessage(to: string, message: string) {
   try {
-    const response = await fetch(
-      `${WHATSAPP_API_URL}/${WHATSAPP_BUSINESS_ID}/messages`,
-      {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${WHATSAPP_API_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          messaging_product: 'whatsapp',
-          to: to,
-          type: 'text',
-          text: { body: message },
-        }),
-      }
-    );
+    const response = await fetch(`${WHATSAPP_API_URL}`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${WHATSAPP_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        messaging_product: 'whatsapp',
+        to: to,
+        type: 'text',
+        text: { body: message },
+      }),
+    });
 
     if (!response.ok) {
       throw new Error(`WhatsApp API error: ${response.statusText}`);
