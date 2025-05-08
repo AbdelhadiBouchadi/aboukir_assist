@@ -15,15 +15,16 @@ export default function ConversationsPage() {
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Conversations</h1>
         <p className="text-muted-foreground">
-          View and manage all patient conversations via WhatsApp.
+          Affichez et gérez toutes les conversations des patients via WhatsApp.
         </p>
       </div>
 
       <Card className="bg-card/20">
         <CardHeader>
-          <CardTitle>Recent Conversations</CardTitle>
+          <CardTitle>Conversations Récentes</CardTitle>
           <CardDescription>
-            A list of all recent patient conversations with the system.
+            Une liste de toutes les conversations récentes des patients avec le
+            système.
           </CardDescription>
         </CardHeader>
         <CardContent className="p-0">

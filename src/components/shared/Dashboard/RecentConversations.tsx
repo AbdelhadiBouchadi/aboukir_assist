@@ -22,6 +22,7 @@ import { CheckCircle2, XCircle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { formatDistanceToNow } from 'date-fns';
 import { Patient } from '@prisma/client';
+import { formatLanguage } from '@/lib/utils';
 
 interface Conversation {
   id: string;
@@ -47,9 +48,9 @@ export function RecentConversations({
     >
       <Card className="bg-card/20">
         <CardHeader>
-          <CardTitle>Recent Conversations</CardTitle>
+          <CardTitle>Conversations Récentes</CardTitle>
           <CardDescription>
-            Latest patient messages across all channels
+            Derniers messages des patients sur tous les canaux
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -58,9 +59,9 @@ export function RecentConversations({
               <TableRow>
                 <TableHead>Patient</TableHead>
                 <TableHead>Message</TableHead>
-                <TableHead>Language</TableHead>
-                <TableHead>Matched</TableHead>
-                <TableHead>Time</TableHead>
+                <TableHead>Langue</TableHead>
+                <TableHead>Correspondance</TableHead>
+                <TableHead>Temps</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -96,9 +97,9 @@ export function RecentConversations({
                           ? 'default'
                           : 'secondary'
                       }
-                      className="text-xs"
+                      className="text-xs w-20 flex items-center justify-center"
                     >
-                      {conversation.language === 'ARABIC' ? 'Arabic' : 'French'}
+                      {formatLanguage(conversation.language!)}
                     </Badge>
                   </TableCell>
                   <TableCell>

@@ -56,9 +56,9 @@ export function PatientList({ data }: PatientListProps) {
             <TableHeader>
               <TableRow>
                 <TableHead>Patient</TableHead>
-                <TableHead>Phone Number</TableHead>
-                <TableHead>Language</TableHead>
-                <TableHead>Last Interaction</TableHead>
+                <TableHead>Num. Tél</TableHead>
+                <TableHead>Langue</TableHead>
+                <TableHead>Dernière interaction</TableHead>
                 <TableHead>Messages</TableHead>
               </TableRow>
             </TableHeader>

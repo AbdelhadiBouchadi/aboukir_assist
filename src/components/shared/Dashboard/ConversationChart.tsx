@@ -30,9 +30,9 @@ export function ConversationChart({ data }: ConversationChartProps) {
   return (
     <Card className="bg-card/20">
       <CardHeader className="pb-2">
-        <CardTitle>Conversations by Month</CardTitle>
+        <CardTitle>Conversations par mois</CardTitle>
         <CardDescription>
-          Distribution of conversations by language over time
+          Répartition des conversations par langue au fil du temps
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -45,13 +45,13 @@ export function ConversationChart({ data }: ConversationChartProps) {
             <Legend />
             <Bar
               dataKey="arabic"
-              name="Arabic"
+              name="Arabe"
               fill="hsl(var(--chart-2))"
               radius={[4, 4, 0, 0]}
             />
             <Bar
               dataKey="french"
-              name="French"
+              name="Français"
               fill="hsl(var(--chart-1))"
               radius={[4, 4, 0, 0]}
             />

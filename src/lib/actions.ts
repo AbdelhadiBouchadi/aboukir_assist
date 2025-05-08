@@ -2,8 +2,9 @@
 
 import { prisma } from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
-import stringSimilarity from 'string-similarity';
-import { sendWhatsAppMessage } from './whatsapp';
+import { sendLanguageSelectionMessage } from './whatsapp';
+import { DashboardStats, MonthlyStats, ResponseDistribution } from '../types';
+import { cosineSimilarity, getEmbedding } from './openai';
 
 // Script actions
 export async function getScripts() {
@@ -27,6 +28,12 @@ export async function createScript(data: {
   category?: string;
   active?: boolean;
 }) {
+  // Generate embeddings for both languages
+  const [embeddingAr, embeddingFr] = await Promise.all([
+    getEmbedding(data.questionAr),
+    getEmbedding(data.questionFr),
+  ]);
+
   const script = await prisma.script.create({
     data: {
       questionAr: data.questionAr,
@@ -36,6 +43,8 @@ export async function createScript(data: {
       keywords: data.keywords || [],
       category: data.category,
       active: data.active !== undefined ? data.active : true,
+      embeddingAr: embeddingAr || [],
+      embeddingFr: embeddingFr || [],
     },
   });
 
@@ -55,9 +64,22 @@ export async function updateScript(
     active?: boolean;
   }
 ) {
+  // Only generate new embeddings if questions are updated
+  const embeddings: { embeddingAr?: number[]; embeddingFr?: number[] } = {};
+
+  if (data.questionAr) {
+    embeddings.embeddingAr = await getEmbedding(data.questionAr);
+  }
+  if (data.questionFr) {
+    embeddings.embeddingFr = await getEmbedding(data.questionFr);
+  }
+
   const script = await prisma.script.update({
     where: { id },
-    data,
+    data: {
+      ...data,
+      ...embeddings,
+    },
   });
 
   revalidatePath('/script');
@@ -114,6 +136,30 @@ export async function createPatient(data: {
   return patient;
 }
 
+export async function updatePatientLanguage(
+  phoneNumber: string,
+  language: 'ARABIC' | 'FRENCH'
+) {
+  const patient = await prisma.patient.findUnique({
+    where: { phoneNumber },
+  });
+
+  if (!patient) {
+    return await createPatient({
+      phoneNumber,
+      language,
+    });
+  }
+
+  const updated = await prisma.patient.update({
+    where: { id: patient.id },
+    data: { language },
+  });
+
+  revalidatePath('/patients');
+  return updated;
+}
+
 // Conversation actions
 export async function getConversations() {
   return await prisma.conversation.findMany({
@@ -123,6 +169,16 @@ export async function getConversations() {
     },
     orderBy: { timestamp: 'desc' },
   });
+}
+
+export async function getPatientLanguage(
+  phoneNumber: string
+): Promise<'ARABIC' | 'FRENCH' | null> {
+  const patient = await prisma.patient.findUnique({
+    where: { phoneNumber },
+  });
+
+  return patient?.language ?? null;
 }
 
 export async function processMessage(
@@ -143,14 +199,43 @@ export async function processMessage(
       },
     });
 
-    // Send welcome message
+    // Get welcome message from settings
     const settings = await getSettings();
-    const welcomeMessage =
-      language === 'ARABIC'
-        ? settings.welcomeMessageAr
-        : settings.welcomeMessageFr;
 
-    await sendWhatsAppMessage(phoneNumber, welcomeMessage);
+    // Create a placeholder conversation for the welcome message
+    const conversation = await prisma.conversation.create({
+      data: {
+        patientId: patient.id,
+        scriptId: null,
+        messageContent: '[Initial contact]',
+        response: `${settings.welcomeMessageFr}\n\n${settings.welcomeMessageAr}`,
+        matched: false,
+        similarity: 0,
+      },
+    });
+
+    // Send language selection message without creating another message
+    await sendLanguageSelectionMessage(
+      phoneNumber,
+      `${settings.welcomeMessageFr}\n\n${settings.welcomeMessageAr}`
+    );
+
+    return {
+      response: `${settings.welcomeMessageFr}\n\n${settings.welcomeMessageAr}`,
+      matched: false,
+      similarity: 0,
+      conversation,
+    };
+  }
+
+  // Use patient's stored language preference
+  language = patient.language;
+  const isArabic = language === 'ARABIC';
+
+  // Get message embedding
+  const messageEmbedding = await getEmbedding(message);
+  if (!messageEmbedding) {
+    throw new Error('Failed to generate message embedding');
   }
 
   // Find the best matching script
@@ -160,23 +245,27 @@ export async function processMessage(
 
   let bestMatch = null;
   let bestScore = 0;
-  let isArabic = language === 'ARABIC';
 
-  // Compare message with questions in appropriate language
   for (const script of scripts) {
-    const compareText = isArabic ? script.questionAr : script.questionFr;
-    const similarity = stringSimilarity.compareTwoStrings(
-      message.toLowerCase(),
-      compareText.toLowerCase()
-    );
+    const scriptEmbedding = isArabic ? script.embeddingAr : script.embeddingFr;
 
-    // Also check if any keywords are present
+    // Skip if script doesn't have embeddings
+    if (!scriptEmbedding || scriptEmbedding.length === 0) {
+      console.warn(
+        `Script ${script.id} missing ${isArabic ? 'Arabic' : 'French'} embedding`
+      );
+      continue;
+    }
+
+    const similarity = cosineSimilarity(messageEmbedding, scriptEmbedding);
+
+    // Add keyword boost
     let keywordBoost = 0;
     if (script.keywords && script.keywords.length > 0) {
       const messageWords = message.toLowerCase().split(/\s+/);
       for (const keyword of script.keywords) {
         if (messageWords.includes(keyword.toLowerCase())) {
-          keywordBoost += 0.1; // Add a small boost for each matched keyword
+          keywordBoost += 0.1;
         }
       }
     }
@@ -200,8 +289,8 @@ export async function processMessage(
       ? bestMatch!.responseAr
       : bestMatch!.responseFr
     : isArabic
-    ? 'عذرًا، لم أفهم سؤالك. هل يمكنك إعادة صياغته؟'
-    : "Désolé, je n'ai pas compris votre question. Pouvez-vous la reformuler?";
+      ? 'عذرًا، لم أفهم سؤالك. هل يمكنك إعادة صياغته؟'
+      : "Désolé, je n'ai pas compris votre question. Pouvez-vous la reformuler?";
 
   // Record the conversation
   const conversation = await prisma.conversation.create({
@@ -220,7 +309,6 @@ export async function processMessage(
     where: { id: patient.id },
     data: {
       lastInteracted: new Date(),
-      language: isArabic ? 'ARABIC' : 'FRENCH',
     },
   });
 
@@ -273,7 +361,7 @@ export async function updateSettings(data: {
 }
 
 // Stats for dashboard
-export async function getDashboardStats() {
+export async function getDashboardStats(): Promise<DashboardStats> {
   const totalPatients = await prisma.patient.count();
 
   const today = new Date();
@@ -321,7 +409,7 @@ export async function getDashboardStats() {
 }
 
 // Analytics
-export async function getMonthlyConversationStats() {
+export async function getMonthlyConversationStats(): Promise<MonthlyStats[]> {
   const startDate = new Date();
   startDate.setMonth(startDate.getMonth() - 6);
 
@@ -357,7 +445,9 @@ export async function getMonthlyConversationStats() {
   return Array.from(monthlyStats.values());
 }
 
-export async function getResponseDistribution() {
+export async function getResponseDistribution(): Promise<
+  ResponseDistribution[]
+> {
   const total = await prisma.conversation.count();
 
   if (total === 0) return [];

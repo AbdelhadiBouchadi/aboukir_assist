@@ -23,6 +23,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
+import { fr } from 'date-fns/locale';
 
 interface Patient {
   id?: string;
@@ -73,9 +74,9 @@ export function ConversationList({ data }: { data: ConversationType[] }) {
           <TableRow>
             <TableHead>Patient</TableHead>
             <TableHead>Message</TableHead>
-            <TableHead>Response</TableHead>
-            <TableHead>Match</TableHead>
-            <TableHead>Time</TableHead>
+            <TableHead>Réponse</TableHead>
+            <TableHead>Correspondance</TableHead>
+            <TableHead>Temps</TableHead>
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -118,7 +119,7 @@ export function ConversationList({ data }: { data: ConversationType[] }) {
               </TableCell>
               <TableCell>
                 {conversation.matched ? (
-                  <Badge className="bg-emerald-500 hover:bg-emerald-600 flex items-center gap-1">
+                  <Badge className="bg-emerald-500 hover:bg-emerald-600 flex justify-center w-20 items-center gap-1">
                     <CheckCircle2 className="h-3 w-3" />
                     <span>
                       {Math.round((conversation.similarity || 0) * 100)}%
@@ -127,7 +128,7 @@ export function ConversationList({ data }: { data: ConversationType[] }) {
                 ) : (
                   <Badge
                     variant="secondary"
-                    className="flex items-center gap-1"
+                    className="flex items-center justify-center gap-1 w-20"
                   >
                     <XCircle className="h-3 w-3" />
                     <span>
@@ -139,6 +140,7 @@ export function ConversationList({ data }: { data: ConversationType[] }) {
               <TableCell className="text-muted-foreground text-sm">
                 {formatDistanceToNow(conversation.timestamp, {
                   addSuffix: true,
+                  locale: fr,
                 })}
               </TableCell>
               <TableCell className="text-right">
@@ -156,10 +158,10 @@ export function ConversationList({ data }: { data: ConversationType[] }) {
                     <DialogHeader>
                       <DialogTitle className="flex items-center gap-2">
                         <MessageCircle className="h-5 w-5" />
-                        Conversation Details
+                        Détails de la conversation
                       </DialogTitle>
                       <DialogDescription>
-                        Full information about this conversation.
+                        Informations complètes sur cette conversation.
                       </DialogDescription>
                     </DialogHeader>
                     {selectedConversation && (
@@ -185,7 +187,7 @@ export function ConversationList({ data }: { data: ConversationType[] }) {
 
                         <div className="space-y-2">
                           <h3 className="text-sm font-medium">
-                            Patient Message
+                            Message du patient
                           </h3>
                           <div className="bg-muted p-3 rounded-lg">
                             <p>{selectedConversation.messageContent}</p>
@@ -200,7 +202,7 @@ export function ConversationList({ data }: { data: ConversationType[] }) {
 
                         <div className="space-y-2">
                           <h3 className="text-sm font-medium">
-                            System Response
+                            Réponse du système
                           </h3>
                           <div className="bg-primary/10 p-3 rounded-lg">
                             <p>{selectedConversation.response}</p>
@@ -208,19 +210,23 @@ export function ConversationList({ data }: { data: ConversationType[] }) {
                         </div>
 
                         <div className="space-y-2">
-                          <h3 className="text-sm font-medium">Match Details</h3>
+                          <h3 className="text-sm font-medium">
+                            Détails de correspondance
+                          </h3>
                           <div className="flex items-center gap-2">
-                            <span>Match Status:</span>
+                            <span>Statut</span>
                             {selectedConversation.matched ? (
                               <Badge className="bg-emerald-500 hover:bg-emerald-600">
-                                Matched
+                                Correspondant
                               </Badge>
                             ) : (
-                              <Badge variant="secondary">Not Matched</Badge>
+                              <Badge variant="secondary">
+                                Non correspondant
+                              </Badge>
                             )}
                           </div>
                           <div className="flex items-center gap-2">
-                            <span>Similarity Score:</span>
+                            <span>Score de similarité :</span>
                             <Badge variant="outline">
                               {Math.round(
                                 (selectedConversation.similarity || 0) * 100

@@ -11,20 +11,18 @@ export default function NewScriptPage() {
   return (
     <div className="flex flex-col gap-8">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">
-          Add New Script Entry
-        </h1>
+        <h1 className="text-3xl font-bold tracking-tight">Ajouter un script</h1>
         <p className="text-muted-foreground">
-          Create a new question and response pair for the automated system.
+          Créez une nouvelle paire question/réponse pour le système automatisé.
         </p>
       </div>
 
-      <Card>
+      <Card className="bg-card/20">
         <CardHeader>
-          <CardTitle>Script Information</CardTitle>
+          <CardTitle>Informations sur le script</CardTitle>
           <CardDescription>
-            Enter the question and response in both Arabic and French. Add
-            relevant keywords to improve matching.
+            Saisissez la question et la réponse en arabe et en français. Ajoutez
+            des mots-clés pertinents pour améliorer la correspondance.
           </CardDescription>
         </CardHeader>
         <CardContent>

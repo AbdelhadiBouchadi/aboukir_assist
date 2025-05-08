@@ -44,10 +44,10 @@ export function ScriptList({ data }: ScriptListProps) {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Question (Arabic)</TableHead>
-                <TableHead>Question (French)</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead>Status</TableHead>
+                <TableHead>Question (Arabe)</TableHead>
+                <TableHead>Question (Français)</TableHead>
+                <TableHead>Catégorie</TableHead>
+                <TableHead>Statut</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -65,12 +65,12 @@ export function ScriptList({ data }: ScriptListProps) {
                     {item.active ? (
                       <Badge className="bg-emerald-500 hover:bg-emerald-600">
                         <Check className="h-3 w-3 mr-1" />
-                        Active
+                        Activé
                       </Badge>
                     ) : (
                       <Badge variant="secondary">
                         <X className="h-3 w-3 mr-1" />
-                        Disabled
+                        Désactivé
                       </Badge>
                     )}
                   </TableCell>
@@ -88,41 +88,41 @@ export function ScriptList({ data }: ScriptListProps) {
                         </DialogTrigger>
                         <DialogContent className="sm:max-w-[625px]">
                           <DialogHeader>
-                            <DialogTitle>Script Entry Details</DialogTitle>
+                            <DialogTitle>Détails du script</DialogTitle>
                             <DialogDescription>
-                              Full information for this question and response
-                              pair.
+                              Informations complètes pour cette paire de
+                              questions et réponses.
                             </DialogDescription>
                           </DialogHeader>
                           {viewItem && (
                             <div className="space-y-6 py-4">
                               <div className="space-y-2">
                                 <h3 className="text-sm font-medium">
-                                  Arabic Question
+                                  Question en arabe
                                 </h3>
                                 <p className="text-sm">{viewItem.questionAr}</p>
                               </div>
                               <div className="space-y-2">
                                 <h3 className="text-sm font-medium">
-                                  French Question
+                                  Question en français
                                 </h3>
                                 <p className="text-sm">{viewItem.questionFr}</p>
                               </div>
                               <div className="space-y-2">
                                 <h3 className="text-sm font-medium">
-                                  Arabic Response
+                                  Response en arabe
                                 </h3>
                                 <p className="text-sm">{viewItem.responseAr}</p>
                               </div>
                               <div className="space-y-2">
                                 <h3 className="text-sm font-medium">
-                                  French Response
+                                  Response en français
                                 </h3>
                                 <p className="text-sm">{viewItem.responseFr}</p>
                               </div>
                               <div className="space-y-2">
                                 <h3 className="text-sm font-medium">
-                                  Keywords
+                                  Mots clés
                                 </h3>
                                 <div className="flex flex-wrap gap-1">
                                   {viewItem.keywords.map((keyword, index) => (
@@ -134,20 +134,20 @@ export function ScriptList({ data }: ScriptListProps) {
                               </div>
                               <div className="space-y-2">
                                 <h3 className="text-sm font-medium">
-                                  Category
+                                  Categorie
                                 </h3>
                                 <Badge variant="outline">
                                   {viewItem.category}
                                 </Badge>
                               </div>
                               <div className="space-y-2">
-                                <h3 className="text-sm font-medium">Status</h3>
+                                <h3 className="text-sm font-medium">Statut</h3>
                                 {viewItem.active ? (
                                   <Badge className="bg-emerald-500 hover:bg-emerald-600">
-                                    Active
+                                    Activé
                                   </Badge>
                                 ) : (
-                                  <Badge variant="secondary">Disabled</Badge>
+                                  <Badge variant="secondary">Désactivé</Badge>
                                 )}
                               </div>
                             </div>

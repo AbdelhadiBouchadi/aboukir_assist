@@ -19,6 +19,8 @@ model Script {
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
   conversations Conversation[]
+  embeddingAr   Float[]       @default([])
+  embeddingFr   Float[]       @default([])
 }
 
 model Patient {

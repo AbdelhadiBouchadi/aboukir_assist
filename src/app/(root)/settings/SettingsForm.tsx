@@ -18,8 +18,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
 import { motion } from 'framer-motion';
-import { useToast } from '@/hooks/use-toast';
 import { updateSettings } from '@/lib/actions';
+import toast from 'react-hot-toast';
+import { CircleCheckBig, Loader2 } from 'lucide-react';
 
 const settingsFormSchema = z.object({
   welcomeMessageAr: z.string().min(3, {
@@ -44,7 +45,6 @@ interface SettingsFormProps {
 }
 
 export function SettingsForm({ defaultValues }: SettingsFormProps) {
-  const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<SettingsFormValues>({
@@ -62,18 +62,11 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
     try {
       await updateSettings(data);
 
-      toast({
-        title: 'Settings updated',
-        description: 'Your settings have been saved successfully.',
-      });
+      toast.success('Paramètres Enregistrés avec succès');
     } catch (error) {
       console.error('Error saving settings:', error);
 
-      toast({
-        title: 'Error',
-        description: 'There was a problem saving your settings.',
-        variant: 'destructive',
-      });
+      toast.error('Une erreure est survenue');
     } finally {
       setIsSubmitting(false);
     }
@@ -104,7 +97,7 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
               name="welcomeMessageAr"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Welcome Message (Arabic)</FormLabel>
+                  <FormLabel>Message de bienvenue (Arabe)</FormLabel>
                   <FormControl>
                     <Textarea
                       placeholder="أدخل رسالة الترحيب بالعربية"
@@ -114,8 +107,8 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
                     />
                   </FormControl>
                   <FormDescription>
-                    This message will be sent to new Arabic-speaking patients
-                    when they first contact the system.
+                    Ce message sera envoyé aux nouveaux patients arabophones
+                    lors de leur premier contact avec le système.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -129,7 +122,7 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
               name="welcomeMessageFr"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Welcome Message (French)</FormLabel>
+                  <FormLabel>Message de bienvenue (Français)</FormLabel>
                   <FormControl>
                     <Textarea
                       placeholder="Entrez le message de bienvenue en français"
@@ -137,8 +130,8 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
                     />
                   </FormControl>
                   <FormDescription>
-                    This message will be sent to new French-speaking patients
-                    when they first contact the system.
+                    Ce message sera envoyé aux nouveaux patients francophones
+                    lors de leur premier contact avec le système.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -153,7 +146,7 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
               render={({ field: { value, onChange, ...fieldProps } }) => (
                 <FormItem>
                   <FormLabel>
-                    Match Threshold ({Math.round(value * 100)}%)
+                    Seuil de correspondance ({Math.round(value * 100)}%)
                   </FormLabel>
                   <FormControl>
                     <Slider
@@ -166,8 +159,9 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
                     />
                   </FormControl>
                   <FormDescription>
-                    Minimum similarity score required for a question to match a
-                    script entry. Higher values require more exact matches.
+                    Score de similarité minimal requis pour qu'une question
+                    corresponde à une entrée de script. Des valeurs plus élevées
+                    nécessitent des correspondances plus exactes.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -183,10 +177,11 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
                 <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
                   <div className="space-y-0.5">
                     <FormLabel className="text-base">
-                      Automatic Replies
+                      Réponses automatiques
                     </FormLabel>
                     <FormDescription>
-                      Enable or disable automatic responses to patient messages.
+                      Activer ou désactiver les réponses automatiques aux
+                      messages des patients.
                     </FormDescription>
                   </div>
                   <FormControl>
@@ -202,7 +197,17 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
 
           <motion.div variants={item} className="flex justify-end">
             <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? 'Saving...' : 'Save Settings'}
+              {isSubmitting ? (
+                <div className="flex items-center gap-2 ">
+                  En cours
+                  <Loader2 className="size-6 animate-spin" />
+                </div>
+              ) : (
+                <div className="flex items-center gap-2 ">
+                  Enregistrer
+                  <CircleCheckBig className="size-6 " />
+                </div>
+              )}
             </Button>
           </motion.div>
         </form>

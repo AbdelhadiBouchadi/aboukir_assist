@@ -147,7 +147,7 @@ export function ScriptForm({ defaultValues = {} }: ScriptFormProps) {
               name="questionAr"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Question (Arabic)</FormLabel>
+                  <FormLabel>Question (Arabe)</FormLabel>
                   <FormControl>
                     <Textarea
                       placeholder="أدخل السؤال بالعربية"
@@ -157,7 +157,8 @@ export function ScriptForm({ defaultValues = {} }: ScriptFormProps) {
                     />
                   </FormControl>
                   <FormDescription>
-                    Enter the question in Arabic that patients might ask.
+                    Saisissez la question en arabe que les patients pourraient
+                    poser.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -171,7 +172,7 @@ export function ScriptForm({ defaultValues = {} }: ScriptFormProps) {
               name="questionFr"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Question (French)</FormLabel>
+                  <FormLabel>Question (Français)</FormLabel>
                   <FormControl>
                     <Textarea
                       placeholder="Entrez la question en français"
@@ -180,7 +181,8 @@ export function ScriptForm({ defaultValues = {} }: ScriptFormProps) {
                     />
                   </FormControl>
                   <FormDescription>
-                    Enter the question in French that patients might ask.
+                    Saisissez la question en français que les patients
+                    pourraient poser.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -194,7 +196,7 @@ export function ScriptForm({ defaultValues = {} }: ScriptFormProps) {
               name="responseAr"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Response (Arabic)</FormLabel>
+                  <FormLabel>Réponse (Arabe)</FormLabel>
                   <FormControl>
                     <Textarea
                       placeholder="أدخل الاستجابة بالعربية"
@@ -204,7 +206,7 @@ export function ScriptForm({ defaultValues = {} }: ScriptFormProps) {
                     />
                   </FormControl>
                   <FormDescription>
-                    Enter the response in Arabic that the system will provide.
+                    Saisissez la réponse en arabe que le système fournira.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -218,7 +220,7 @@ export function ScriptForm({ defaultValues = {} }: ScriptFormProps) {
               name="responseFr"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Response (French)</FormLabel>
+                  <FormLabel>Réponse (Français)</FormLabel>
                   <FormControl>
                     <Textarea
                       placeholder="Entrez la réponse en français"
@@ -227,7 +229,7 @@ export function ScriptForm({ defaultValues = {} }: ScriptFormProps) {
                     />
                   </FormControl>
                   <FormDescription>
-                    Enter the response in French that the system will provide.
+                    Saisissez la réponse en français que le système fournira.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -237,7 +239,7 @@ export function ScriptForm({ defaultValues = {} }: ScriptFormProps) {
 
           <motion.div variants={item}>
             <div className="space-y-4">
-              <FormLabel>Keywords</FormLabel>
+              <FormLabel>Mots Clés</FormLabel>
               <div className="flex gap-2">
                 <Input
                   placeholder="Add keyword"
@@ -252,7 +254,7 @@ export function ScriptForm({ defaultValues = {} }: ScriptFormProps) {
                   className="flex-1"
                 />
                 <Button type="button" onClick={addKeyword} variant="secondary">
-                  Add
+                  Ajouter
                 </Button>
               </div>
               <div className="flex flex-wrap gap-2 mt-2">
@@ -270,14 +272,14 @@ export function ScriptForm({ defaultValues = {} }: ScriptFormProps) {
                       onClick={() => removeKeyword(kw)}
                     >
                       <X className="h-3 w-3" />
-                      <span className="sr-only">Remove</span>
+                      <span className="sr-only">Retirer</span>
                     </Button>
                   </Badge>
                 ))}
               </div>
               <FormDescription>
-                Add keywords that will help match this script entry with patient
-                questions.
+                Ajoutez des mots-clés qui aideront à faire correspondre cette
+                entrée de script aux questions du patient.
               </FormDescription>
             </div>
           </motion.div>
@@ -288,7 +290,7 @@ export function ScriptForm({ defaultValues = {} }: ScriptFormProps) {
               name="category"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Category</FormLabel>
+                  <FormLabel>Catégorie</FormLabel>
                   <FormControl>
                     <Select value={field.value} onValueChange={field.onChange}>
                       <SelectTrigger className="w-full">
@@ -307,7 +309,8 @@ export function ScriptForm({ defaultValues = {} }: ScriptFormProps) {
                     </Select>
                   </FormControl>
                   <FormDescription>
-                    Select a category to organize script entries.
+                    Sélectionnez une catégorie pour organiser les entrées de
+                    script.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -328,10 +331,11 @@ export function ScriptForm({ defaultValues = {} }: ScriptFormProps) {
                     />
                   </FormControl>
                   <div className="space-y-1 leading-none">
-                    <FormLabel>Active</FormLabel>
+                    <FormLabel>Activé</FormLabel>
                     <FormDescription>
-                      If checked, this script entry will be used for matching
-                      patient questions.
+                      Si cette case est cochée, cette entrée de script sera
+                      utilisée pour faire correspondre les questions des
+                      patients.
                     </FormDescription>
                   </div>
                 </FormItem>
@@ -347,23 +351,23 @@ export function ScriptForm({ defaultValues = {} }: ScriptFormProps) {
               disabled={isSubmitting}
               className="w-24"
             >
-              Cancel
+              Annuler
               <CircleX className="size-6" />
             </Button>
             <Button type="submit" disabled={isSubmitting} className="w-24">
               {isSubmitting ? (
                 <div className="flex items-center gap-2 ">
-                  Saving
+                  En cours
                   <Loader2 className="size-6 animate-spin" />
                 </div>
               ) : defaultValues.id ? (
                 <div className="flex items-center gap-2">
-                  Update
+                  Modifier
                   <RotateCcw className="size-6" />
                 </div>
               ) : (
                 <div className="flex items-center gap-2">
-                  Create
+                  Créer
                   <CirclePlus className="size-6" />
                 </div>
               )}

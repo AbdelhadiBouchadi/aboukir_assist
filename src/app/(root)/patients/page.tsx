@@ -10,7 +10,8 @@ export default async function PatientsPage() {
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Patients</h1>
           <p className="text-muted-foreground">
-            Manage and view all patient interactions and conversation history.
+            Gérez et visualisez toutes les interactions avec les patients et
+            l’historique des conversations.
           </p>
         </div>
       </div>

@@ -30,7 +30,7 @@ export const MenuDatas = [
     icon: Users,
   },
   {
-    title: 'Settings',
+    title: 'Paramètres',
     path: '/settings',
     icon: Settings,
   },
@@ -38,7 +38,7 @@ export const MenuDatas = [
 
 export const dashboardStats = [
   {
-    title: 'Total Patients',
+    title: 'Total de Patients',
     value: 342,
     suffix: '',
     change: '+12.3%',
@@ -47,7 +47,7 @@ export const dashboardStats = [
     color: '#0ea5e9',
   },
   {
-    title: 'Conversations Today',
+    title: "Conversations d'aujourd'hui",
     value: 87,
     suffix: '',
     change: '-5.2%',
@@ -56,7 +56,7 @@ export const dashboardStats = [
     color: '#8b5cf6',
   },
   {
-    title: 'Response Rate',
+    title: 'Taux de réponse',
     value: 92,
     suffix: '%',
     change: '+1.8%',
@@ -65,7 +65,7 @@ export const dashboardStats = [
     color: '#10b981',
   },
   {
-    title: 'Match Accuracy',
+    title: 'Précision de correspondance',
     value: 85,
     suffix: '%',
     change: '+2.5%',
@@ -77,17 +77,23 @@ export const dashboardStats = [
 
 export const monthlyConversationStats = [
   { name: 'Jan', arabic: 45, french: 78 },
-  { name: 'Feb', arabic: 52, french: 85 },
+  { name: 'Fév', arabic: 52, french: 85 },
   { name: 'Mar', arabic: 61, french: 92 },
-  { name: 'Apr', arabic: 48, french: 88 },
-  { name: 'May', arabic: 55, french: 95 },
-  { name: 'Jun', arabic: 67, french: 103 },
+  { name: 'Avr', arabic: 48, french: 88 },
+  { name: 'Mai', arabic: 55, french: 95 },
+  { name: 'Juin', arabic: 67, french: 103 },
+  { name: 'Juill', arabic: 67, french: 103 },
+  { name: 'Août', arabic: 67, french: 103 },
+  { name: 'Sept', arabic: 67, french: 103 },
+  { name: 'Oct', arabic: 67, french: 103 },
+  { name: 'Nov', arabic: 67, french: 103 },
+  { name: 'Déc', arabic: 67, french: 103 },
 ];
 
 export const responseDistribution = [
-  { name: 'Matched', value: 75 },
-  { name: 'Manual', value: 15 },
-  { name: 'Unmatched', value: 10 },
+  { name: 'Correspondant', value: 75 },
+  { name: 'Mannuel', value: 15 },
+  { name: 'Non Correspondant', value: 10 },
 ];
 
 export const demoScriptData = [

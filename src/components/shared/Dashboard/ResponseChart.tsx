@@ -33,9 +33,9 @@ export function ResponseChart({ data }: ResponseChartProps) {
   return (
     <Card className="bg-card/20">
       <CardHeader className="pb-2">
-        <CardTitle>Response Distribution</CardTitle>
+        <CardTitle>Distribution des réponses</CardTitle>
         <CardDescription>
-          Breakdown of automated vs manual responses
+          Répartition des réponses automatisées et manuelles
         </CardDescription>
       </CardHeader>
       <CardContent>
