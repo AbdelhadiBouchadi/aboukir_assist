@@ -165,20 +165,21 @@ export async function handleWhatsAppWebhook(req: Request) {
 async function processIncomingMessage(message: any, value: any) {
   try {
     const phoneNumber = message.from;
+    const name = value.contacts?.[0]?.profile?.name;
 
     // Handle interactive responses (button clicks)
     if (message.type === 'interactive' && message.interactive?.button_reply) {
       const buttonId = message.interactive.button_reply.id;
 
       if (buttonId === 'lang_fr') {
-        await updatePatientLanguage(phoneNumber, 'FRENCH');
+        await updatePatientLanguage(phoneNumber, 'FRENCH', name);
         await sendWhatsAppMessage(
           phoneNumber,
           "Merci d'avoir choisi le français. Comment puis-je vous aider aujourd'hui ?"
         );
         return;
       } else if (buttonId === 'lang_ar') {
-        await updatePatientLanguage(phoneNumber, 'ARABIC');
+        await updatePatientLanguage(phoneNumber, 'ARABIC', name);
         await sendWhatsAppMessage(
           phoneNumber,
           'شكراً لاختيارك اللغة العربية. كيف يمكنني مساعدتك اليوم؟'
@@ -206,7 +207,8 @@ async function processIncomingMessage(message: any, value: any) {
       const response = await processMessage(
         phoneNumber,
         messageContent,
-        patientLang === 'ARABIC' ? 'ARABIC' : 'FRENCH'
+        patientLang === 'ARABIC' ? 'ARABIC' : 'FRENCH',
+        name
       );
 
       await sendWhatsAppMessage(phoneNumber, response.response);

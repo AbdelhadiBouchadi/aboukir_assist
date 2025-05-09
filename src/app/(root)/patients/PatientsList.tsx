@@ -25,6 +25,7 @@ import {
 import { motion } from 'framer-motion';
 import { formatDistanceToNow } from 'date-fns';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { formatLanguage, getInitials } from '@/lib/utils';
 
 interface Patient {
   id: string;
@@ -69,27 +70,22 @@ export function PatientList({ data }: PatientListProps) {
                     <div className="flex items-center gap-2">
                       <Avatar className="h-8 w-8">
                         <AvatarFallback className="bg-primary/10 text-primary text-xs">
-                          {patient.name
-                            ? patient.name
-                                .split(' ')
-                                .map((n) => n[0])
-                                .join('')
-                            : 'P'}
+                          {getInitials(patient.name)}
                         </AvatarFallback>
                       </Avatar>
                       <span className="font-medium">
-                        {patient.name || 'Unknown'}
+                        {patient.name || 'Patient'}
                       </span>
                     </div>
                   </TableCell>
-                  <TableCell>{patient.phoneNumber}</TableCell>
+                  <TableCell>+{patient.phoneNumber}</TableCell>
                   <TableCell>
                     <Badge
                       variant={
                         patient.language === 'ARABIC' ? 'default' : 'secondary'
                       }
                     >
-                      {patient.language}
+                      {formatLanguage(patient.language)}
                     </Badge>
                   </TableCell>
                   <TableCell>

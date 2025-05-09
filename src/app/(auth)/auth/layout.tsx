@@ -5,7 +5,7 @@ import '../../globals.css';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Dental Clinic Admin Panel',
+  title: 'Aboukir Assist | Authentication',
   description: 'WhatsApp Automation Dashboard for Dental Clinic',
 };
 

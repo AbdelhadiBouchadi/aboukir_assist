@@ -9,9 +9,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: 'STELLANTIS | Système de Gestion Des Amadeus',
-  description:
-    'Plateforme digitale dédiée à la création, la gestion et le suivi des Amadeus au sein de Stellantis Kénitra',
+  title: 'Aboukir Assist | Admin Dashboard',
+  description: 'WhatsApp Automation Dashboard for Dental Clinic',
 };
 
 export default function RootLayout({

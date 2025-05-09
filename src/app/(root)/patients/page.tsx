@@ -2,6 +2,7 @@ import { Suspense } from 'react';
 import { PatientList } from './PatientsList';
 import { getPatients } from '@/lib/actions';
 import { demoPatientData } from '@/lib/data';
+import { ConversationsLoading } from '@/components/shared/Conversations/ConversationsLoading';
 
 export default async function PatientsPage() {
   return (
@@ -16,7 +17,7 @@ export default async function PatientsPage() {
         </div>
       </div>
 
-      <Suspense fallback={<div>Loading patients...</div>}>
+      <Suspense fallback={<ConversationsLoading />}>
         <PatientListWrapper />
       </Suspense>
     </div>
@@ -24,6 +25,6 @@ export default async function PatientsPage() {
 }
 
 async function PatientListWrapper() {
-  //   const patientData = await getPatients();
-  return <PatientList data={demoPatientData} />;
+  const patientData = await getPatients();
+  return <PatientList data={patientData} />;
 }

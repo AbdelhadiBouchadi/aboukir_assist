@@ -9,12 +9,14 @@ export type PatientWithConversationCount = Patient & {
 export type PatientWithConversations = Patient & {
   conversations: (Conversation & {
     script: Script | null;
+    responses: Response[];
   })[];
 };
 
 export type ConversationWithRelations = Conversation & {
   patient: Patient;
   script: Script | null;
+  responses: Response[];
 };
 
 export type DashboardStats = {

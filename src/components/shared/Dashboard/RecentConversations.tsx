@@ -22,7 +22,7 @@ import { CheckCircle2, XCircle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { formatDistanceToNow } from 'date-fns';
 import { Patient } from '@prisma/client';
-import { formatLanguage } from '@/lib/utils';
+import { formatLanguage, getInitials } from '@/lib/utils';
 
 interface Conversation {
   id: string;
@@ -71,18 +71,15 @@ export function RecentConversations({
                     <div className="flex items-center gap-2">
                       <Avatar className="h-8 w-8">
                         <AvatarFallback className="bg-primary/10 text-primary text-xs">
-                          {conversation.patient
-                            .name!.split(' ')
-                            .map((n) => n[0])
-                            .join('')}
+                          {getInitials(conversation.patient.name)}
                         </AvatarFallback>
                       </Avatar>
                       <div>
                         <div className="font-medium">
-                          {conversation.patient.name}
+                          {conversation.patient.name || 'Patient'}
                         </div>
                         <div className="text-xs text-muted-foreground">
-                          {conversation.patient.phoneNumber}
+                          +{conversation.patient.phoneNumber}
                         </div>
                       </div>
                     </div>
@@ -99,7 +96,7 @@ export function RecentConversations({
                       }
                       className="text-xs w-20 flex items-center justify-center"
                     >
-                      {formatLanguage(conversation.language!)}
+                      {formatLanguage(conversation.patient.language)}
                     </Badge>
                   </TableCell>
                   <TableCell>

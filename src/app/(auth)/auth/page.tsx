@@ -54,12 +54,7 @@ export default function AuthPage() {
 
   return (
     <div className="flex items-center justify-center min-h-screen">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="w-full max-w-md p-4"
-      >
+      <div className="w-full max-w-md p-4">
         <div className="flex flex-col items-center justify-center mb-8">
           <Stethoscope className="h-12 w-12 text-primary mb-2" />
           <h1 className="text-2xl font-bold text-center">Aboukir Assist</h1>
@@ -118,7 +113,7 @@ export default function AuthPage() {
             </CardFooter>
           </form>
         </Card>
-      </motion.div>
+      </div>
     </div>
   );
 }

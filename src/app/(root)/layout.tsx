@@ -6,7 +6,7 @@ import Sidebar from '@/components/shared/Layouts/Sidebar';
 import { requireAuth } from '@/lib/auth';
 
 export const metadata: Metadata = {
-  title: 'Dental Clinic Admin Panel',
+  title: 'Aboukir Assit | Admin Dashboard',
   description: 'WhatsApp Automation Dashboard for Dental Clinic',
 };
 

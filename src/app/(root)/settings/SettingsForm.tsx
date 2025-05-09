@@ -21,6 +21,7 @@ import { motion } from 'framer-motion';
 import { updateSettings } from '@/lib/actions';
 import toast from 'react-hot-toast';
 import { CircleCheckBig, Loader2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 const settingsFormSchema = z.object({
   welcomeMessageAr: z.string().min(3, {
@@ -46,6 +47,7 @@ interface SettingsFormProps {
 
 export function SettingsForm({ defaultValues }: SettingsFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const router = useRouter();
 
   const form = useForm<SettingsFormValues>({
     resolver: zodResolver(settingsFormSchema),
@@ -63,6 +65,7 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
       await updateSettings(data);
 
       toast.success('Paramètres Enregistrés avec succès');
+      router.push('/');
     } catch (error) {
       console.error('Error saving settings:', error);
 

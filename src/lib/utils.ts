@@ -12,3 +12,19 @@ export const formatLanguage = (lang: string) => {
   };
   return mapping[lang] || lang;
 };
+
+export const getInitials = (name: string | null) => {
+  if (!name) return '??';
+  return name
+    .split(' ')
+    .map((n) => n[0])
+    .join('')
+    .toUpperCase();
+};
+
+export function normalize(text: string) {
+  return text
+    .toLowerCase()
+    .replace(/[?.!,]/g, '')
+    .trim();
+}

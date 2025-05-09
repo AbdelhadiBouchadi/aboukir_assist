@@ -2,7 +2,7 @@
 
 import { prisma } from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
-import { sendLanguageSelectionMessage } from './whatsapp';
+import { sendLanguageSelectionMessage, sendWhatsAppMessage } from './whatsapp';
 import { DashboardStats, MonthlyStats, ResponseDistribution } from '../types';
 import { cosineSimilarity, getEmbedding } from './openai';
 
@@ -113,7 +113,12 @@ export async function getPatient(id: string) {
     include: {
       conversations: {
         orderBy: { timestamp: 'desc' },
-        include: { script: true },
+        include: {
+          script: true,
+          responses: {
+            orderBy: { timestamp: 'asc' },
+          },
+        },
       },
     },
   });
@@ -138,7 +143,8 @@ export async function createPatient(data: {
 
 export async function updatePatientLanguage(
   phoneNumber: string,
-  language: 'ARABIC' | 'FRENCH'
+  language: 'ARABIC' | 'FRENCH',
+  name?: string
 ) {
   const patient = await prisma.patient.findUnique({
     where: { phoneNumber },
@@ -148,6 +154,7 @@ export async function updatePatientLanguage(
     return await createPatient({
       phoneNumber,
       language,
+      name,
     });
   }
 
@@ -166,6 +173,9 @@ export async function getConversations() {
     include: {
       patient: true,
       script: true,
+      responses: {
+        orderBy: { timestamp: 'asc' },
+      },
     },
     orderBy: { timestamp: 'desc' },
   });
@@ -184,7 +194,8 @@ export async function getPatientLanguage(
 export async function processMessage(
   phoneNumber: string,
   message: string,
-  language: 'ARABIC' | 'FRENCH' = 'FRENCH'
+  language: 'ARABIC' | 'FRENCH' = 'FRENCH',
+  name?: string
 ) {
   // Find or create patient
   let patient = await prisma.patient.findUnique({
@@ -196,6 +207,7 @@ export async function processMessage(
       data: {
         phoneNumber,
         language,
+        name: name || null,
       },
     });
 
@@ -208,9 +220,17 @@ export async function processMessage(
         patientId: patient.id,
         scriptId: null,
         messageContent: '[Initial contact]',
-        response: `${settings.welcomeMessageFr}\n\n${settings.welcomeMessageAr}`,
         matched: false,
         similarity: 0,
+        responses: {
+          create: {
+            content: `${settings.welcomeMessageFr}\n\n${settings.welcomeMessageAr}`,
+            isAutomatic: true,
+          },
+        },
+      },
+      include: {
+        responses: true,
       },
     });
 
@@ -284,7 +304,7 @@ export async function processMessage(
 
   // If we have a good match and auto-reply is enabled, use it
   const matched = bestScore >= threshold && settings.autoReplyEnabled;
-  const response = matched
+  const responseContent = matched
     ? isArabic
       ? bestMatch!.responseAr
       : bestMatch!.responseFr
@@ -298,9 +318,17 @@ export async function processMessage(
       patientId: patient.id,
       scriptId: matched ? bestMatch!.id : null,
       messageContent: message,
-      response,
       matched,
       similarity: bestScore,
+      responses: {
+        create: {
+          content: responseContent,
+          isAutomatic: matched,
+        },
+      },
+    },
+    include: {
+      responses: true,
     },
   });
 
@@ -317,11 +345,66 @@ export async function processMessage(
   revalidatePath('/dashboard');
 
   return {
-    response,
+    response: responseContent,
     matched,
     similarity: bestScore,
     conversation,
   };
+}
+
+export async function getPatientConversations(patientId: string) {
+  return await prisma.conversation.findMany({
+    where: { patientId },
+    orderBy: { timestamp: 'asc' },
+    include: {
+      responses: {
+        orderBy: { timestamp: 'asc' },
+      },
+    },
+  });
+}
+
+export async function sendManualReply(patientId: string, content: string) {
+  const patient = await prisma.patient.findUnique({
+    where: { id: patientId },
+    include: {
+      conversations: {
+        orderBy: { timestamp: 'desc' },
+        take: 1,
+        include: {
+          responses: true,
+        },
+      },
+    },
+  });
+
+  if (!patient) {
+    throw new Error('Patient not found');
+  }
+
+  // Send the manual reply via WhatsApp
+  await sendWhatsAppMessage(patient.phoneNumber, content);
+
+  // Create a new response for the most recent conversation
+  const lastConversation = patient.conversations[0];
+  const newResponse = await prisma.response.create({
+    data: {
+      conversationId: lastConversation.id,
+      content,
+      isAutomatic: false,
+    },
+  });
+
+  // Update patient's last interaction time
+  await prisma.patient.update({
+    where: { id: patient.id },
+    data: {
+      lastInteracted: new Date(),
+    },
+  });
+
+  revalidatePath('/conversations');
+  return newResponse;
 }
 
 // Settings actions
@@ -448,31 +531,18 @@ export async function getMonthlyConversationStats(): Promise<MonthlyStats[]> {
 export async function getResponseDistribution(): Promise<
   ResponseDistribution[]
 > {
-  const total = await prisma.conversation.count();
+  const total = await prisma.response.count();
 
   if (total === 0) return [];
 
-  const matched = await prisma.conversation.count({
-    where: { matched: true },
+  const automatic = await prisma.response.count({
+    where: { isAutomatic: true },
   });
 
-  const manual = await prisma.conversation.count({
-    where: {
-      matched: false,
-      response: {
-        notIn: [
-          'عذرًا، لم أفهم سؤالك. هل يمكنك إعادة صياغته؟',
-          "Désolé, je n'ai pas compris votre question. Pouvez-vous la reformuler?",
-        ],
-      },
-    },
-  });
-
-  const unmatched = total - matched - manual;
+  const manual = total - automatic;
 
   return [
-    { name: 'Matched', value: Math.round((matched / total) * 100) },
-    { name: 'Manual', value: Math.round((manual / total) * 100) },
-    { name: 'Unmatched', value: Math.round((unmatched / total) * 100) },
+    { name: 'Automatique', value: Math.round((automatic / total) * 100) },
+    { name: 'Manuelle', value: Math.round((manual / total) * 100) },
   ];
 }

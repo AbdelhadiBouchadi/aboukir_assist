@@ -39,12 +39,21 @@ model Conversation {
   patientId      String
   scriptId       String?
   messageContent String
-  response       String
   timestamp      DateTime @default(now())
   matched        Boolean  @default(false)
   similarity     Float?   @default(0)
   patient        Patient  @relation(fields: [patientId], references: [id])
   script         Script?  @relation(fields: [scriptId], references: [id])
+  responses      Response[]
+}
+
+model Response {
+  id             String       @id @default(cuid())
+  conversationId String
+  content        String
+  isAutomatic    Boolean     @default(false)
+  timestamp      DateTime    @default(now())
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
 }
 
 model Setting {
