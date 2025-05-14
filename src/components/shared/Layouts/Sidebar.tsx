@@ -9,6 +9,7 @@ import { motion } from 'framer-motion';
 import { Stethoscope } from 'lucide-react';
 import { IconType } from 'react-icons/lib';
 import { UserButton } from '../Users/UserButton';
+import Image from 'next/image';
 
 interface SidebarLinkProps {
   title: string;
@@ -90,8 +91,13 @@ const Sidebar = () => {
           href="/"
           className="flex justify-center items-center gap-2 mb-8 w-full"
         >
-          <Stethoscope className="h-8 w-8 text-primary" />
-          <span className="text-xl font-bold text-primary">Aboukir Assist</span>
+          <Image
+            width={200}
+            height={100}
+            src="/aboukir_logo.png"
+            className="object-cover"
+            alt="Aboukir Assit Logo"
+          />
         </Link>
       </motion.div>
       <motion.div variants={container} className="flex-colo gap-2 mt-6">

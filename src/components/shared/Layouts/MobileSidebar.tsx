@@ -10,6 +10,7 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { UserButton } from '../Users/UserButton';
 import { IconType } from 'react-icons/lib';
+import Image from 'next/image';
 
 interface SidebarLinkProps {
   title: string;
@@ -79,10 +80,13 @@ const MobileSidebar = () => {
             className="flex justify-center items-center gap-2 mb-8"
             onClick={handleLinkClick}
           >
-            <Stethoscope className="h-8 w-8 text-primary" />
-            <span className="text-xl font-bold text-primary">
-              Aboukir Assist
-            </span>
+            <Image
+              width={200}
+              height={100}
+              src="/aboukir_logo.png"
+              className="object-cover"
+              alt="Aboukir Assit Logo"
+            />
           </Link>
           <div className="flex flex-col gap-2 mt-6 flex-grow">
             {MenuDatas.map((item, index) => (

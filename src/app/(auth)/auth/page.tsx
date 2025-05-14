@@ -22,6 +22,7 @@ import {
   InputOTPSeparator,
 } from '@/components/ui/input-otp';
 import toast from 'react-hot-toast';
+import Image from 'next/image';
 
 export default function AuthPage() {
   const router = useRouter();
@@ -56,11 +57,13 @@ export default function AuthPage() {
     <div className="flex items-center justify-center min-h-screen">
       <div className="w-full max-w-md p-4">
         <div className="flex flex-col items-center justify-center mb-8">
-          <Stethoscope className="h-12 w-12 text-primary mb-2" />
-          <h1 className="text-2xl font-bold text-center">Aboukir Assist</h1>
-          <p className="text-sm text-muted-foreground text-center mt-1">
-            WhatsApp Automation for Dental Clinics
-          </p>
+          <Image
+            width={200}
+            height={100}
+            src="/aboukir_logo.png"
+            className="object-cover"
+            alt="Aboukir Assit Logo"
+          />
         </div>
 
         <Card>

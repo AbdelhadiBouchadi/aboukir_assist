@@ -2,6 +2,7 @@
 
 import {
   getPatientLanguage,
+  getSettings,
   processMessage,
   updatePatientLanguage,
 } from './actions';
@@ -194,7 +195,7 @@ async function processIncomingMessage(message: any, value: any) {
       // Send only once
       await sendLanguageSelectionMessage(
         phoneNumber,
-        'Bienvenue au centre de médecine dentaire Aboukir. Veuillez choisir votre langue / مرحباً بكم في مركز أبو كير لطب الأسنان. الرجاء اختيار اللغة الخاصة بكم'
+        'Bienvenue au centre dentaire Aboukir. Veuillez choisir votre langue / مرحباً بكم في مركز أبو كير لطب و جراحة الأسنان. الرجاء اختيار اللغة الخاصة بكم'
       );
       return; // prevent any further message processing until language is selected
     }
