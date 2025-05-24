@@ -3,7 +3,12 @@
 import { prisma } from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 import { sendLanguageSelectionMessage, sendWhatsAppMessage } from './whatsapp';
-import { DashboardStats, MonthlyStats, ResponseDistribution } from '../types';
+import {
+  ConversationState,
+  DashboardStats,
+  MonthlyStats,
+  ResponseDistribution,
+} from '../types';
 import { cosineSimilarity, getEmbedding } from './openai';
 
 // Script actions
@@ -134,6 +139,7 @@ export async function createPatient(data: {
       phoneNumber: data.phoneNumber,
       name: data.name,
       language: data.language || 'FRENCH',
+      conversationState: ConversationState.WELCOME,
     },
   });
 
@@ -165,6 +171,88 @@ export async function updatePatientLanguage(
 
   revalidatePath('/patients');
   return updated;
+}
+
+// New: Update patient conversation state
+export async function updatePatientState(
+  phoneNumber: string,
+  state: ConversationState,
+  lastServiceId?: string
+) {
+  const patient = await prisma.patient.findUnique({
+    where: { phoneNumber },
+  });
+
+  if (!patient) {
+    throw new Error('Patient not found');
+  }
+
+  const updated = await prisma.patient.update({
+    where: { id: patient.id },
+    data: {
+      conversationState: state,
+      lastServiceId: lastServiceId || patient.lastServiceId,
+    },
+  });
+
+  revalidatePath('/patients');
+  return updated;
+}
+
+// New: Get patient by phone number, create if not exists
+export async function getPatientById(phoneNumber: string, name?: string) {
+  let patient = await prisma.patient.findUnique({
+    where: { phoneNumber },
+  });
+
+  if (!patient) {
+    patient = await createPatient({
+      phoneNumber,
+      name: name,
+    });
+  }
+
+  return patient;
+}
+
+// New: Create a conversation with response
+export async function createConversationWithResponse(
+  patientId: string,
+  messageContent: string,
+  responseContent: string,
+  isAutomatic: boolean = true
+) {
+  const conversation = await prisma.conversation.create({
+    data: {
+      patientId,
+      scriptId: null,
+      messageContent,
+      matched: false,
+      similarity: 0,
+      responses: {
+        create: {
+          content: responseContent,
+          isAutomatic,
+        },
+      },
+    },
+    include: {
+      responses: true,
+    },
+  });
+
+  // Update patient last interaction
+  await prisma.patient.update({
+    where: { id: patientId },
+    data: {
+      lastInteracted: new Date(),
+    },
+  });
+
+  revalidatePath('/conversations');
+  revalidatePath('/patients');
+
+  return conversation;
 }
 
 // Conversation actions
@@ -208,6 +296,7 @@ export async function processMessage(
         phoneNumber,
         language,
         name: name || null,
+        conversationState: ConversationState.WELCOME,
       },
     });
 
@@ -332,17 +421,21 @@ export async function processMessage(
     },
   });
 
-  // Update patient last interaction
+  // Update patient last interaction and ensure they're in general conversation state
   await prisma.patient.update({
     where: { id: patient.id },
     data: {
       lastInteracted: new Date(),
+      conversationState: ConversationState.GENERAL_CONVERSATION,
     },
   });
 
   revalidatePath('/conversations');
   revalidatePath('/patients');
   revalidatePath('/dashboard');
+
+  // Send the response via WhatsApp
+  await sendWhatsAppMessage(phoneNumber, responseContent);
 
   return {
     response: responseContent,
@@ -400,6 +493,7 @@ export async function sendManualReply(patientId: string, content: string) {
     where: { id: patient.id },
     data: {
       lastInteracted: new Date(),
+      conversationState: ConversationState.GENERAL_CONVERSATION,
     },
   });
 

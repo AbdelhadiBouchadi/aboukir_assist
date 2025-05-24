@@ -5,7 +5,16 @@ import {
   getSettings,
   processMessage,
   updatePatientLanguage,
+  updatePatientState,
+  getPatientById,
+  createConversationWithResponse,
 } from './actions';
+import {
+  DENTAL_SERVICES,
+  RESPONSES,
+  getServiceByNumericText,
+} from './dentistry';
+import { ConversationState } from '../types';
 
 const WHATSAPP_PHONE_NUMBER = process.env.WHATSAPP_PHONE_NUMBER;
 const WHATSAPP_API_KEY = process.env.WHATSAPP_API_KEY;
@@ -109,6 +118,132 @@ export async function sendLanguageSelectionMessage(
   }
 }
 
+export async function sendAppointmentConfirmationMessage(
+  to: string,
+  question: string
+) {
+  try {
+    console.log('Sending appointment confirmation message:', { to, question });
+
+    const response = await fetch(WHATSAPP_API_URL, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${WHATSAPP_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        messaging_product: 'whatsapp',
+        recipient_type: 'individual',
+        to: to,
+        type: 'interactive',
+        interactive: {
+          type: 'button',
+          body: {
+            text: question,
+          },
+          action: {
+            buttons: [
+              {
+                type: 'reply',
+                reply: {
+                  id: 'appointment_yes',
+                  title: 'Oui',
+                },
+              },
+              {
+                type: 'reply',
+                reply: {
+                  id: 'appointment_no',
+                  title: 'Non',
+                },
+              },
+            ],
+          },
+        },
+      }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      console.error('WhatsApp API error response:', error);
+      throw new Error(`WhatsApp API error: ${JSON.stringify(error)}`);
+    }
+
+    const result = await response.json();
+    console.log('WhatsApp appointment confirmation success:', result);
+    return result;
+  } catch (error) {
+    console.error('Error sending appointment confirmation message:', error);
+    throw error;
+  }
+}
+
+export async function sendArabicAppointmentConfirmationMessage(
+  to: string,
+  question: string
+) {
+  try {
+    console.log('Sending Arabic appointment confirmation message:', {
+      to,
+      question,
+    });
+
+    const response = await fetch(WHATSAPP_API_URL, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${WHATSAPP_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        messaging_product: 'whatsapp',
+        recipient_type: 'individual',
+        to: to,
+        type: 'interactive',
+        interactive: {
+          type: 'button',
+          body: {
+            text: question,
+          },
+          action: {
+            buttons: [
+              {
+                type: 'reply',
+                reply: {
+                  id: 'appointment_yes',
+                  title: 'نعم',
+                },
+              },
+              {
+                type: 'reply',
+                reply: {
+                  id: 'appointment_no',
+                  title: 'لا',
+                },
+              },
+            ],
+          },
+        },
+      }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      console.error('WhatsApp API error response:', error);
+      throw new Error(`WhatsApp API error: ${JSON.stringify(error)}`);
+    }
+
+    const result = await response.json();
+    console.log('WhatsApp Arabic appointment confirmation success:', result);
+    return result;
+  } catch (error) {
+    console.error(
+      'Error sending Arabic appointment confirmation message:',
+      error
+    );
+    throw error;
+  }
+}
+
 export async function verifyWhatsAppWebhook(req: Request) {
   const searchParams = new URL(req.url).searchParams;
   const mode = searchParams.get('hub.mode');
@@ -168,36 +303,125 @@ async function processIncomingMessage(message: any, value: any) {
     const phoneNumber = message.from;
     const name = value.contacts?.[0]?.profile?.name;
 
+    // Get or create patient and check conversation state
+    const patient = await getPatientById(phoneNumber, name);
+    const patientLang = patient?.language || 'FRENCH';
+    const isArabic = patientLang === 'ARABIC';
+    const conversationState =
+      patient?.conversationState || ConversationState.WELCOME;
+
+    console.log('Processing message for patient:', {
+      phoneNumber,
+      name,
+      language: patientLang,
+      state: conversationState,
+    });
+
     // Handle interactive responses (button clicks)
     if (message.type === 'interactive' && message.interactive?.button_reply) {
       const buttonId = message.interactive.button_reply.id;
 
+      // Handle language selection
       if (buttonId === 'lang_fr') {
         await updatePatientLanguage(phoneNumber, 'FRENCH', name);
-        await sendWhatsAppMessage(
+        await updatePatientState(
           phoneNumber,
-          "Merci d'avoir choisi le français. Comment puis-je vous aider aujourd'hui ?"
+          ConversationState.SERVICE_SELECTION
         );
+
+        // Send service menu in French
+        await sendWhatsAppMessage(phoneNumber, RESPONSES.serviceMenu.fr);
+
+        // Record this in the conversation
+        await createConversationWithResponse(
+          patient.id,
+          'Language selection: French',
+          RESPONSES.serviceMenu.fr,
+          true
+        );
+
         return;
       } else if (buttonId === 'lang_ar') {
         await updatePatientLanguage(phoneNumber, 'ARABIC', name);
-        await sendWhatsAppMessage(
+        await updatePatientState(
           phoneNumber,
-          'شكراً لاختيارك اللغة العربية. كيف يمكنني مساعدتك اليوم؟'
+          ConversationState.SERVICE_SELECTION
         );
+
+        // Send service menu in Arabic
+        await sendWhatsAppMessage(phoneNumber, RESPONSES.serviceMenu.ar);
+
+        // Record this in the conversation
+        await createConversationWithResponse(
+          patient.id,
+          'Language selection: Arabic',
+          RESPONSES.serviceMenu.ar,
+          true
+        );
+
+        return;
+      }
+
+      // Handle appointment confirmation responses
+      else if (buttonId === 'appointment_yes') {
+        await updatePatientState(
+          phoneNumber,
+          ConversationState.GENERAL_CONVERSATION
+        );
+        const response = isArabic
+          ? RESPONSES.appointmentYes.ar
+          : RESPONSES.appointmentYes.fr;
+
+        await sendWhatsAppMessage(phoneNumber, response);
+
+        // Record this in the conversation
+        await createConversationWithResponse(
+          patient.id,
+          'Appointment confirmation: Yes',
+          response,
+          true
+        );
+
+        return;
+      } else if (buttonId === 'appointment_no') {
+        await updatePatientState(
+          phoneNumber,
+          ConversationState.GENERAL_CONVERSATION
+        );
+        const response = isArabic
+          ? RESPONSES.appointmentNo.ar
+          : RESPONSES.appointmentNo.fr;
+
+        await sendWhatsAppMessage(phoneNumber, response);
+
+        // Record this in the conversation
+        await createConversationWithResponse(
+          patient.id,
+          'Appointment confirmation: No',
+          response,
+          true
+        );
+
         return;
       }
     }
 
-    // 🔐 NEW: Check if the user has selected a language yet
-    const patientLang = await getPatientLanguage(phoneNumber);
-    if (!patientLang) {
-      // Send only once
+    // If this is a new user without language selection, send welcome message
+    if (conversationState === ConversationState.WELCOME) {
       await sendLanguageSelectionMessage(
         phoneNumber,
-        'Bienvenue au centre dentaire Aboukir. Veuillez choisir votre langue / مرحباً بكم في مركز أبو كير لطب و جراحة الأسنان. الرجاء اختيار اللغة الخاصة بكم'
+        RESPONSES.welcome.message
       );
-      return; // prevent any further message processing until language is selected
+
+      // Record this in the conversation
+      await createConversationWithResponse(
+        patient.id,
+        '[Initial contact]',
+        RESPONSES.welcome.message,
+        true
+      );
+
+      return;
     }
 
     // Process regular text messages
@@ -205,16 +429,110 @@ async function processIncomingMessage(message: any, value: any) {
       const messageContent = message.text?.body;
       if (!messageContent) return;
 
-      const response = await processMessage(
+      // Handle different conversation states
+      if (conversationState === ConversationState.SERVICE_SELECTION) {
+        // Try to match the message to a service
+        const service = getServiceByNumericText(messageContent);
+
+        if (service) {
+          // Update patient state and last selected service
+          await updatePatientState(
+            phoneNumber,
+            ConversationState.APPOINTMENT_CONFIRMATION,
+            service.id
+          );
+
+          // Send service information
+          const serviceResponse = isArabic
+            ? service.responseAr
+            : service.responseFr;
+          await sendWhatsAppMessage(phoneNumber, serviceResponse);
+
+          // Record this in the conversation
+          await createConversationWithResponse(
+            patient.id,
+            `Service selection: ${isArabic ? service.nameAr : service.nameFr}`,
+            serviceResponse,
+            true
+          );
+
+          // Ask about appointment
+          const appointmentQuestion = isArabic
+            ? RESPONSES.appointmentQuestion.ar
+            : RESPONSES.appointmentQuestion.fr;
+
+          if (isArabic) {
+            await sendArabicAppointmentConfirmationMessage(
+              phoneNumber,
+              appointmentQuestion
+            );
+          } else {
+            await sendAppointmentConfirmationMessage(
+              phoneNumber,
+              appointmentQuestion
+            );
+          }
+
+          return;
+        }
+
+        // If no service matched, fall back to the script matching system
+        await fallbackToScriptMatching(
+          phoneNumber,
+          messageContent,
+          patientLang,
+          name,
+          patient
+        );
+        return;
+      }
+
+      // Default: use the existing script matching system
+      await fallbackToScriptMatching(
         phoneNumber,
         messageContent,
-        patientLang === 'ARABIC' ? 'ARABIC' : 'FRENCH',
-        name
+        patientLang,
+        name,
+        patient
       );
-
-      await sendWhatsAppMessage(phoneNumber, response.response);
     }
   } catch (error) {
     console.error('Error processing message:', error);
   }
+}
+
+// Helper function to use the existing script matching system
+async function fallbackToScriptMatching(
+  phoneNumber: string,
+  messageContent: string,
+  language: 'ARABIC' | 'FRENCH',
+  name?: string,
+  patient?: any
+) {
+  console.log('Falling back to script matching for:', {
+    phoneNumber,
+    messageContent,
+  });
+
+  // If the patient is in a structured flow, move them to general conversation
+  if (
+    patient &&
+    patient.conversationState !== ConversationState.GENERAL_CONVERSATION
+  ) {
+    await updatePatientState(
+      phoneNumber,
+      ConversationState.GENERAL_CONVERSATION
+    );
+  }
+
+  // Use the existing script matching logic
+  const response = await processMessage(
+    phoneNumber,
+    messageContent,
+    language === 'ARABIC' ? 'ARABIC' : 'FRENCH',
+    name
+  );
+
+  // Message is already sent by processMessage
+  return response;
 }

@@ -5,7 +5,6 @@ import {
   FileText,
   Users,
   Settings,
-  BarChart3,
 } from 'lucide-react';
 
 export const MenuDatas = [

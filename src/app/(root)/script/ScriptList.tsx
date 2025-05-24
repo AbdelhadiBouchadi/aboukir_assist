@@ -100,7 +100,9 @@ export function ScriptList({ data }: ScriptListProps) {
                                 <h3 className="text-sm font-medium">
                                   Question en arabe
                                 </h3>
-                                <p className="text-sm">{viewItem.questionAr}</p>
+                                <p className="text-sm" dir="rtl">
+                                  {viewItem.questionAr}
+                                </p>
                               </div>
                               <div className="space-y-2">
                                 <h3 className="text-sm font-medium">
@@ -112,7 +114,9 @@ export function ScriptList({ data }: ScriptListProps) {
                                 <h3 className="text-sm font-medium">
                                   Response en arabe
                                 </h3>
-                                <p className="text-sm">{viewItem.responseAr}</p>
+                                <p className="text-sm" dir="rtl">
+                                  {viewItem.responseAr}
+                                </p>
                               </div>
                               <div className="space-y-2">
                                 <h3 className="text-sm font-medium">
@@ -120,18 +124,20 @@ export function ScriptList({ data }: ScriptListProps) {
                                 </h3>
                                 <p className="text-sm">{viewItem.responseFr}</p>
                               </div>
-                              <div className="space-y-2">
-                                <h3 className="text-sm font-medium">
-                                  Mots clés
-                                </h3>
-                                <div className="flex flex-wrap gap-1">
-                                  {viewItem.keywords.map((keyword, index) => (
-                                    <Badge key={index} variant="secondary">
-                                      {keyword}
-                                    </Badge>
-                                  ))}
+                              {viewItem.keywords.length > 0 && (
+                                <div className="space-y-2">
+                                  <h3 className="text-sm font-medium">
+                                    Mots clés
+                                  </h3>
+                                  <div className="flex flex-wrap gap-1">
+                                    {viewItem.keywords.map((keyword, index) => (
+                                      <Badge key={index} variant="secondary">
+                                        {keyword}
+                                      </Badge>
+                                    ))}
+                                  </div>
                                 </div>
-                              </div>
+                              )}
                               <div className="space-y-2">
                                 <h3 className="text-sm font-medium">
                                   Categorie

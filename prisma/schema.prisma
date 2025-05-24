@@ -32,6 +32,8 @@ model Patient {
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
   conversations  Conversation[]
+  conversationState  ConversationState? @default(WELCOME)
+  lastServiceId      String?           // Store the last service selected
 }
 
 model Conversation {
@@ -68,4 +70,11 @@ model Setting {
 enum Language {
   FRENCH
   ARABIC
+}
+
+enum ConversationState {
+  WELCOME
+  SERVICE_SELECTION
+  APPOINTMENT_CONFIRMATION
+  GENERAL_CONVERSATION
 }
