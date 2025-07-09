@@ -20,6 +20,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <meta
+          name="facebook-domain-verification"
+          content="fnj5zzaoooefkofuxfu34k0xv7wcwj"
+        />
+      </head>
       <body className={`${inter.className} antialiased xl:h-screen flex-colo`}>
         {children}
         <Toaster position="top-right" />
