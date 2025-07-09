@@ -6,7 +6,6 @@ import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Stethoscope } from 'lucide-react';
 import { IconType } from 'react-icons/lib';
 import { UserButton } from '../Users/UserButton';
 import Image from 'next/image';

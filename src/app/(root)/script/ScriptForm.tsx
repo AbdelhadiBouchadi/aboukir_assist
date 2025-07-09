@@ -65,10 +65,6 @@ interface ScriptFormProps {
 
 export function ScriptForm({ defaultValues = {} }: ScriptFormProps) {
   const router = useRouter();
-  const [keywords, setKeywords] = useState<string[]>(
-    defaultValues.keywords || []
-  );
-  const [keyword, setKeyword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const form = useForm<ScriptFormValues>({
@@ -83,23 +79,11 @@ export function ScriptForm({ defaultValues = {} }: ScriptFormProps) {
     },
   });
 
-  const addKeyword = () => {
-    if (keyword.trim() && !keywords.includes(keyword.trim())) {
-      setKeywords([...keywords, keyword.trim()]);
-      setKeyword('');
-    }
-  };
-
-  const removeKeyword = (keywordToRemove: string) => {
-    setKeywords(keywords.filter((k) => k !== keywordToRemove));
-  };
-
   const onSubmit = async (data: ScriptFormValues) => {
     setIsSubmitting(true);
     try {
       const formData = {
         ...data,
-        keywords,
       };
 
       if ('id' in defaultValues && defaultValues.id) {
@@ -235,53 +219,6 @@ export function ScriptForm({ defaultValues = {} }: ScriptFormProps) {
                 </FormItem>
               )}
             />
-          </motion.div>
-
-          <motion.div variants={item}>
-            <div className="space-y-4">
-              <FormLabel>Mots Clés</FormLabel>
-              <div className="flex gap-2">
-                <Input
-                  placeholder="Add keyword"
-                  value={keyword}
-                  onChange={(e) => setKeyword(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      addKeyword();
-                    }
-                  }}
-                  className="flex-1"
-                />
-                <Button type="button" onClick={addKeyword} variant="secondary">
-                  Ajouter
-                </Button>
-              </div>
-              <div className="flex flex-wrap gap-2 mt-2">
-                {keywords.map((kw, index) => (
-                  <Badge
-                    key={index}
-                    variant="secondary"
-                    className="flex items-center gap-1 px-3 py-1"
-                  >
-                    {kw}
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-4 w-4 p-0 hover:bg-transparent"
-                      onClick={() => removeKeyword(kw)}
-                    >
-                      <X className="h-3 w-3" />
-                      <span className="sr-only">Retirer</span>
-                    </Button>
-                  </Badge>
-                ))}
-              </div>
-              <FormDescription>
-                Ajoutez des mots-clés qui aideront à faire correspondre cette
-                entrée de script aux questions du patient.
-              </FormDescription>
-            </div>
           </motion.div>
 
           <motion.div variants={item}>

@@ -12,7 +12,6 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { motion } from 'framer-motion';
 import { CheckCircle, Loader2, Stethoscope } from 'lucide-react';
 import { verifyOTP } from '@/lib/auth';
 import {

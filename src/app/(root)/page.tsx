@@ -1,9 +1,4 @@
-import {
-  dashboardStats,
-  demoConversations,
-  monthlyConversationStats,
-  responseDistribution,
-} from '@/lib/data';
+import { dashboardStats } from '@/lib/data';
 import {
   getDashboardStats,
   getConversations,

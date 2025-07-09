@@ -1,19 +1,13 @@
 'use server';
 
 import {
-  getPatientLanguage,
-  getSettings,
   processMessage,
   updatePatientLanguage,
   updatePatientState,
   getPatientById,
   createConversationWithResponse,
 } from './actions';
-import {
-  DENTAL_SERVICES,
-  RESPONSES,
-  getServiceByNumericText,
-} from './dentistry';
+import { RESPONSES, getServiceByNumericText } from './dentistry';
 import { ConversationState } from '../types';
 
 const WHATSAPP_PHONE_NUMBER = process.env.WHATSAPP_PHONE_NUMBER;
