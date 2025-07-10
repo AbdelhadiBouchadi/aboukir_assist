@@ -6,8 +6,7 @@ export default function TermsOfServicePage() {
 
       <p>
         En utilisant notre service WhatsApp, vous acceptez les conditions
-        suivantes relatives à l'utilisation, la communication et la
-        confidentialité.
+        suivantes établies par le cabinet <strong>Youssef Aboukir</strong>.
       </p>
 
       <section>

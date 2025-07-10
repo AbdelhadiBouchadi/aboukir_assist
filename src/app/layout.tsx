@@ -10,7 +10,8 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: 'Aboukir Assist | Admin Dashboard',
-  description: 'WhatsApp Automation Dashboard for Dental Clinic',
+  description:
+    'WhatsApp Automation Dashboard for Youssef Aboukir / Centre Dentaire Aboukir',
 };
 
 export default function RootLayout({

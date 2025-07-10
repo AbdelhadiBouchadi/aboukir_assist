@@ -4,9 +4,10 @@ export default function PrivacyPolicyPage() {
       <h1 className="text-3xl font-bold">Politique de confidentialité</h1>
 
       <p>
-        Cette politique de confidentialité décrit comment nous collectons,
-        utilisons et protégeons vos informations personnelles lorsque vous
-        utilisez notre service WhatsApp.
+        Cette politique de confidentialité explique comment{' '}
+        <strong>Youssef Aboukir</strong> collecte, utilise et protège vos
+        informations personnelles lors de l'utilisation de notre service
+        WhatsApp.
       </p>
 
       <section>
